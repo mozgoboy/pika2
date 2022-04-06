@@ -32,8 +32,8 @@
 #include "LabeledClause.hpp"
 #include "Clause.hpp"
 #include "Match.hpp"
-#include "MemoKey.hpp";
-#include "MemoTable.hpp";
+#include "MemoKey.hpp"
+#include "MemoTable.hpp"
 
 #include <iostream>
 #include <stdlib.h>
@@ -58,7 +58,7 @@ public:
     void determineWhetherCanMatchZeroChars() {
     }
 
-    Match match(MemoTable memoTable, MemoKey memoKey, string input) {
+    Match* match(MemoTable* memoTable, MemoKey* memoKey, string input) {
         cout << "ASTNodeLabel node should not be in final grammar";
         abort();
     }

@@ -47,7 +47,7 @@ public:
     static void replaceNonASCII(string str, string buf) {
         for (int i = 0; i < str.length(); i++) {
             char c = str[i];
-            buf.append(replaceNonASCII(c));
+            buf.append(to_string(replaceNonASCII(c)));
         }
     }
 
@@ -180,7 +180,7 @@ public:
                 }
             }
             else {
-                buf.append(to_string(c)s);
+                buf.append(to_string(c));
             }
         }
         return buf;
@@ -207,12 +207,15 @@ public:
             return "\\b";
         }
         else {
-            return "\\u" + String.format("%04x", (int)c);
+            char* buf;
+            sprintf(buf, "%04x", (int)c);
+            string buff(buf);
+            return "\\u" + buff;
         }
     }
 
     /** Escape a single-quoted character. */
-    public static String escapeQuotedChar(char c) {
+    static string escapeQuotedChar(char c) {
         if (c == '\'') {
             return "\\'";
         }
@@ -225,7 +228,7 @@ public:
     }
 
     /** Escape a character. */
-    public static String escapeQuotedStringChar(char c) {
+    static string escapeQuotedStringChar(char c) {
         if (c == '"') {
             return "\\\"";
         }
@@ -238,7 +241,7 @@ public:
     }
 
     /** Escape a character for inclusion in a character range pattern. */
-    public static String escapeCharRangeChar(char c) {
+    static string escapeCharRangeChar(char c) {
         if (c == ']') {
             return "\\]";
         }
@@ -257,12 +260,12 @@ public:
     }
 
     /** Escape a string. */
-    public static String escapeString(String str) {
-        var buf = new StringBuilder();
+    static string escapeString(string str) {
+        string buf;
         for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
+            char c = str[i];
             buf.append(c == '"' ? "\\\"" : escapeQuotedStringChar(c));
         }
-        return buf.toString();
+        return buf;
     }
-}
+};

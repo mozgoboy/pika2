@@ -43,6 +43,7 @@
 
 /** The FollowedBy (lookahead) PEG operator. */
 class FollowedBy : public Clause {
+public:
     TypesOfClauses TypeOfClause = TypesOfClauses::FollowedBy;
     FollowedBy(Clause* subClause) : Clause(vector<Clause*> { subClause }) {
 
@@ -62,8 +63,8 @@ class FollowedBy : public Clause {
         Match* subClauseMatch = memoTable->lookUpBestMatch(&subClauseMemoKey);
         if (subClauseMatch != nullptr) {
             // If there is any valid subclause match, return a new zero-length match
-            Match mast(memoKey);
-            return &mast;
+            Match*  mast = new Match(memoKey);
+            return mast;
         }
         return nullptr;
     }

@@ -19,7 +19,8 @@
 
 using namespace std;
 
-enum class TypesOfClauses {Clause , First , FollowedBy , NotFollowedBy , OneOrMore , Seq , CharSeq , CharSet , Nothing , Start , Terminal , ASTNodeLabel , RuleRef  };
+enum class TypesOfClauses {Clause , First , FollowedBy , NotFollowedBy , OneOrMore , 
+	Seq , CharSeq , CharSet , Nothing , Start , Terminal , ASTNodeLabel , RuleRef  };
 
 
 

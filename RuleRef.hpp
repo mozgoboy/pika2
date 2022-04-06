@@ -31,8 +31,8 @@
 
 #include "Clause.hpp"
 #include "Match.hpp"
-#include "MemoKey.hpp";
-#include "MemoTable.hpp";
+#include "MemoKey.hpp"
+#include "MemoTable.hpp"
 
 #include <iostream>
 #include <stdlib.h>

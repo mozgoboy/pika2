@@ -40,6 +40,7 @@
 #include <string>
 
 class OneOrMore : public Clause {
+public:
     TypesOfClauses TypeOfClause = TypesOfClauses::OneOrMore;
     OneOrMore(Clause* subClause) : Clause(vector<Clause*> { subClause }) {
     }
@@ -64,16 +65,16 @@ class OneOrMore : public Clause {
         // If there are two or more matches, tailMatch will be non-null.
         MemoKey tailMatchMemoKey(this, memoKey->startPos + subClauseMatch->len);
         Match* tailMatch = memoTable->lookUpBestMatch(&tailMatchMemoKey);
-        Match mast1(memoKey, /* len = */ subClauseMatch->len, //
+        Match* mast1 = new Match(memoKey, /* len = */ subClauseMatch->len, //
             vector<Match*>{ subClauseMatch });
-        Match mast2(memoKey, /* len = */ subClauseMatch->len + tailMatch->len, //
+        Match* mast2 = new Match(memoKey, /* len = */ subClauseMatch->len + tailMatch->len, //
             vector<Match*>{ subClauseMatch, tailMatch });
         // Return a new (right-recursive) match
         return tailMatch == nullptr //
                 // There is only one match => match has only one subclause
-            ? &mast1
+            ? mast1
             // There are two or more matches => match has two subclauses (head, tail)
-            : &mast2;
+            : mast2;
     }
     string toString() {
         if (toStringCached.empty()) {

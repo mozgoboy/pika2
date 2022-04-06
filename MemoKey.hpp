@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <cstdio>
-#include "Clause.hpp";
+#include "Clause.hpp"
 
 class MemoKey
 {
@@ -17,7 +17,7 @@ public:
 	MemoKey()
 	{}
 
-	MemoKey(Clause clause, int startPos) 
+	MemoKey(Clause* clause, int startPos) 
 	{
 		this->clause = clause;
 		this->startPos = startPos;
@@ -25,13 +25,14 @@ public:
 
 	int hashCode() 
 	{
-		return clause.hashCode() ^ startPos; // тут побитовая операция исключающего или
+		std::hash<Clause*> hut;
+		return hut(clause) ^ startPos; // тут побитовая операция исключающего или
 
 	}
 
-	bool equals(Memokey mem) 
+	bool equals(MemoKey* mem) 
 	{
-		if ((mem.clause == this->clause) && (mem.startPos == this->startPos))
+		if ((mem->clause == this->clause) && (mem->startPos == this->startPos))
 		{
 			return true;
 		}
@@ -43,11 +44,11 @@ public:
 
 	string toStringWithRuleNames() 
 	{
-		return clause.toStringWithRuleNames() + " : " + startPos;
+		return clause->toStringWithRuleNames() + " : " + to_string(startPos);
 	}
 
 	string toString() 
 	{
-		return clause.toString() + " : " + startPos;
+		return clause->toString() + " : " + to_string(startPos);
 	}
 };

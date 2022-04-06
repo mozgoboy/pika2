@@ -40,6 +40,7 @@
 
 /** The First (ordered choice) PEG operator. */
 class First : public Clause {
+public:
     TypesOfClauses TypeOfClause = TypesOfClauses::First;
     First(vector<Clause*> subClauses) : Clause(subClauses) {
         if (subClauses.size() < 2) {
@@ -74,9 +75,9 @@ class First : public Clause {
             Match* subClauseMatch = memoTable->lookUpBestMatch(&subClauseMemoKey);
             if (subClauseMatch != nullptr) {
                 // Return a match for the first matching subclause
-                Match mast(memoKey, /* len = */ subClauseMatch->len,
+                Match* mast = new Match(memoKey, /* len = */ subClauseMatch->len,
                 /* firstMatchingSubclauseIdx = */ subClauseIdx, vector<Match*>{ subClauseMatch });
-                return &mast;
+                return mast;
             }
         }
         return nullptr;

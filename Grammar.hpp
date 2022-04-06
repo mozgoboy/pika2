@@ -15,13 +15,23 @@
 #include "Clause.hpp"
 #include "Nothing.hpp"
 #include <ranges>
+
+
+struct cmp
+{
+	bool operator()(const Clause*& c1, const Clause*& c2)    // pass by a const reference
+	{
+		return c1->clauseIdx > c2->clauseIdx;
+	}
+};
+
 class Grammar
 {
 private:
 
 public:
 	vector<Rule*> allRules;
-	unordered_map<string, Rule*> ruleNameWithPrecedenceToRule;
+	map<string, Rule*> ruleNameWithPrecedenceToRule;
 	vector<Clause*> allClauses;
 	bool DEBUG = false;
 
@@ -48,12 +58,13 @@ public:
 			// тут есть моментик что rulesWithName достаЄм из анордеред мапа если существует, а если нет то создаЄм 
 
 			rulesWithName.push_back(rule);
-			GrammarUtils::checkNoRefCycles(rule->labeledClause->clause, rule->ruleName, new unordered_set<Clause>());
+			set<Clause*> visited;
+			GrammarUtils::checkNoRefCycles(rule->labeledClause->clause, rule->ruleName, visited);
 		}
 
 		allRules = rules;
-		vector<Clause> lowestPrecedenceClauses;
-		unordered_map<string,string> ruleNameToLowestPrecedenceLevelRuleName;
+		vector<Clause*> lowestPrecedenceClauses;
+		map<string,string> ruleNameToLowestPrecedenceLevelRuleName;
 		
 		for (auto ent : ruleNameToRules) 
 		{
@@ -65,7 +76,7 @@ public:
 					ruleNameToLowestPrecedenceLevelRuleName);
 			}
 		}
-		unordered_map<string, Rule*> ruleNameWithPrecedenceToRule;
+		map<string, Rule*> ruleNameWithPrecedenceToRule;
 		// «акоменченное выше вызывает метод entrySet, который вовращает что-то типа набора пар ключ значение, € если честно не понимаю как оно должно прописыватьс€.
 		for (auto rule : allRules) {
 			// The handlePrecedence call above added the precedence to the rule name as a suffix
@@ -80,7 +91,7 @@ public:
 			rule->labeledClause->clause->registerRule(rule);
 		}
 
-		unordered_map<string, Clause*> toStringToClause;
+		map<string, Clause*> toStringToClause;
 		for (auto rule : allRules) 
 		{
 			rule->labeledClause->clause = GrammarUtils::intern(rule->labeledClause->clause, toStringToClause);
@@ -108,7 +119,7 @@ public:
 	MemoTable* parse(string input) {
 		priority_queue< Clause*, vector<Clause*>, cmp > priorityQueue;
 
-		MemoTable memoTable(this, input);
+		MemoTable* memoTable = new MemoTable(this, input);
 
 		vector<Clause*> terminals;
 		for (auto clause : allClauses) {
@@ -136,11 +147,11 @@ public:
 				auto clause = priorityQueue.top();
 				priorityQueue.pop();
 				MemoKey memoKey(clause, startPos);
-				Match* match = clause->match(&memoTable, &memoKey, input);
-				memoTable.addMatch(memoKey, match, priorityQueue);
+				Match* match = clause->match(memoTable, &memoKey, input);
+				memoTable->addMatch(&memoKey, match, priorityQueue);
 			}
 		}
-		return &memoTable;
+		return memoTable;
 	}
 
 
@@ -166,10 +177,3 @@ public:
 };
 
 
-struct cmp
-{
-		bool operator()(const Clause*& c1, const Clause*& c2)    // pass by a const reference
-		{
-			return c1->clauseIdx > c2->clauseIdx;
-		}
-};

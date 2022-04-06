@@ -42,6 +42,7 @@
 
 /** The Seq (sequence) PEG operator. */
 class Seq : public Clause {
+public:
     TypesOfClauses TypeOfClause = TypesOfClauses::Seq;
     Seq(vector<Clause*> subClauses) : Clause(subClauses) {
         if (subClauses.size() < 2) {
@@ -92,7 +93,7 @@ class Seq : public Clause {
         for (int subClauseIdx = 0; subClauseIdx < labeledSubClauses.size(); subClauseIdx++) {
             Clause* subClause = labeledSubClauses[subClauseIdx]->clause;
             MemoKey subClauseMemoKey(subClause, currStartPos);
-            Match* subClauseMatch = memoTable->lookUpBestMatch(subClauseMemoKey);
+            Match* subClauseMatch = memoTable->lookUpBestMatch(&subClauseMemoKey);
             if (subClauseMatch == nullptr) {
                 // Fail after first subclause fails to match
                 return nullptr;
@@ -104,8 +105,8 @@ class Seq : public Clause {
             currStartPos += subClauseMatch->len;
         }
         // All subclauses matched, so the Seq clause matches
-        Match mast(memoKey, /* len = */ currStartPos - memoKey->startPos, subClauseMatches);
-        return &mast;
+        Match*  mast = new Match(memoKey, /* len = */ currStartPos - memoKey->startPos, subClauseMatches);
+        return mast;
     }
     /** Пока не уверены, наверное сравнение с имеющимися элементами в мемо чтобы не разбирать. Но это не точно. */
 

@@ -38,6 +38,7 @@ using namespace std;
 
 /** Tree utilities. */
 class TreeUtils {
+public:
     /** Render the AST rooted at an {@link ASTNode} into a StringBuffer. */
     static void renderTreeView(ASTNode* astNode, string input, string indentStr, bool isLastChild, string buf) {
         int inpLen = 80;

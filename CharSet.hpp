@@ -77,8 +77,8 @@ public:
 			bitset<8> b(c);
 			if ((chars != NULL && (chars == b)) || (invertedChars != NULL && !(invertedChars == b))) 
 			{
-				Match mast(memoKey, /* len = */ 1, Match::NO_SUBCLAUSE_MATCHES);
-				return &mast
+				Match* mast = new Match(memoKey, /* len = */ 1, Match::NO_SUBCLAUSE_MATCHES);
+				return mast;
 			}
 		}
 		return nullptr;
@@ -89,7 +89,7 @@ public:
 		if (isSingleChar) {
 			char c = (char)chars.nextSetBit(0);
 			buf.append("'");
-			buf.append(StringUtils.escapeQuotedChar(c));
+			buf.append(StringUtils::escapeQuotedChar(c));
 			buf.append("'");
 		}
 		else {
@@ -98,7 +98,7 @@ public:
 				buf.append(" ^ ");
 			}
 			for (int i = chars.nextSetBit(0); i >= 0; i = chars.nextSetBit(i + 1)) {
-				buf.append(StringUtils.escapeCharRangeChar((char)i));
+				buf.append(StringUtils::escapeCharRangeChar((char)i));
 				if (i < chars.size() - 1 && chars.get(i + 1)) {
 					// Contiguous char range
 					int end = i + 2;
@@ -109,7 +109,7 @@ public:
 					if (numCharsSpanned > 2) {
 						buf.append(" - ");
 					}
-					buf.append(StringUtils.escapeCharRangeChar((char)(end - 1)));
+					buf.append(StringUtils::escapeCharRangeChar((char)(end - 1)));
 					i = end - 1;
 				}
 			}
