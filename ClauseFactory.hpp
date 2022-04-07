@@ -163,7 +163,7 @@ public:
     {
         bool invert = charRangeStr[0] == '^';
         auto charList = StringUtils::getCharRangeChars(invert ? charRangeStr.substr(1) : charRangeStr); // Пока не совсем понял что эта функция делает
-        auto chars = new bitset(0xffff);
+        auto chars = new bitset<256>;
         for (int i = 0; i < charList.size(); i++) {
             auto c = charList[i];
             if (c.length() == 2) 
