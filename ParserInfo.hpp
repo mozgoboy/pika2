@@ -15,10 +15,10 @@ class ParserInfo
 {
 private:
     int findCycleDepth(Match* match,
-        unordered_map<int, unordered_map<int, unordered_map<int, Match>>>* cycleDepthToMatches)
+        map<int, map<int, map<int, Match*>>> cycleDepthToMatches)
     {
         auto cycleDepth = 0;
-        for (auto subClauseMatchEnt : *match->getSubClauseMatches()) 
+        for (auto subClauseMatchEnt : match->getSubClauseMatches())
         {
             auto subClauseMatch = subClauseMatchEnt.second;
             auto subClauseIsInDifferentCycle = //
@@ -34,17 +34,17 @@ private:
             k -> new TreeMap<>());
 
         matchesForClauseIdx.put(match.memoKey.startPos, match);
-        */ 
+        */
         // Выше че то снова сложно через treemap
         return cycleDepth;
     }
 
 public:
-    void printClauses(Grammar grammar)
+    void printClauses(Grammar* grammar)
     {
-        for (int i = grammar.allClauses.size() - 1; i >= 0; --i)
+        for (int i = grammar->allClauses.size() - 1; i >= 0; --i)
         {
-            auto clause = grammar.allClauses[i];
+            auto clause = grammar->allClauses[i];
             cout << i << " : " << clause->toStringWithRuleNames();
         }
     }
@@ -53,16 +53,16 @@ public:
     {
         vector<string> buf;
         int marginWidth = 0;
-        for (int i = 0; i < memoTable->grammar.allClauses.size(); i++)
+        for (int i = 0; i < memoTable->grammar->allClauses.size(); i++)
         {
-            string s = memoTable->grammar.allClauses.size() - 1 - i + " : ";
+            string s = memoTable->grammar->allClauses.size() - 1 - i + " : ";
             buf[i].append(s);
-            Clause* clause = memoTable->grammar.allClauses[memoTable->grammar.allClauses.size() - 1 - i];
-            if (clause->TypeOfClause == TypesOfClauses::Terminal) 
+            Clause* clause = memoTable->grammar->allClauses[memoTable->grammar->allClauses.size() - 1 - i];
+            if (clause->TypeOfClause == TypesOfClauses::Terminal)
             {
                 buf[i].append("[terminal] ");
             }
-            if (clause->canMatchZeroChars) 
+            if (clause->canMatchZeroChars)
             {
                 buf[i].append("[canMatchZeroChars] ");
             }
@@ -70,7 +70,7 @@ public:
             marginWidth = max(marginWidth, buf[i].length() + 2);
         }
         int tableWidth = marginWidth + memoTable->input.length() + 1;
-        for (int i = 0; i < memoTable->grammar.allClauses.size(); i++) 
+        for (int i = 0; i < memoTable->grammar->allClauses.size(); i++)
         {
             while (buf[i].length() < marginWidth) {
                 buf[i].append(" ");
@@ -80,22 +80,22 @@ public:
             }
         }
         auto nonOverlappingMatches = memoTable->getAllNonOverlappingMatches();
-        for (auto clauseIdx = memoTable->grammar.allClauses.size() - 1; clauseIdx >= 0; --clauseIdx) 
+        for (auto clauseIdx = memoTable->grammar->allClauses.size() - 1; clauseIdx >= 0; --clauseIdx)
         {
-            auto row = memoTable->grammar.allClauses.size() - 1 - clauseIdx;
-            auto clause = memoTable->grammar.allClauses[clauseIdx];
+            auto row = memoTable->grammar->allClauses.size() - 1 - clauseIdx;
+            auto clause = memoTable->grammar->allClauses[clauseIdx];
             auto matchesForClause = nonOverlappingMatches[clause];
-            if (matchesForClause != nullptr) 
+            if (!matchesForClause.empty())
             {
-                for (auto matchEnt : matchesForClause.entrySet()) 
+                for (auto matchEnt : matchesForClause)
                 {
                     auto match = matchEnt.second;
-                    auto matchStartPos = match.memoKey.startPos;
-                    auto matchEndPos = matchStartPos + match.len;
-                    if (matchStartPos <= memoTable->input.length()) 
+                    auto matchStartPos = match->memoKey->startPos;
+                    auto matchEndPos = matchStartPos + match->len;
+                    if (matchStartPos <= memoTable->input.length())
                     {
                         buf[row][marginWidth + matchStartPos] = '#';
-                        for (int j = matchStartPos + 1; j < matchEndPos; j++) 
+                        for (int j = matchStartPos + 1; j < matchEndPos; j++)
                         {
                             if (j <= memoTable->input.length()) {
                                 buf[row][marginWidth + j] = '=';
@@ -122,60 +122,60 @@ public:
 
     void printParseTreeInMemoTableForm(MemoTable* memoTable)
     {
-        if (memoTable->grammar.allClauses.size() == 0) 
+        if (memoTable->grammar->allClauses.size() == 0)
         {
             //throw new IllegalArgumentException("Grammar is empty");
             // пробрасываем исключение
         }
 
-        auto cycleDepthToMatches = new unordered_map<int, unordered_map<int, unordered_map<int, Match>>>(Collections.reverseOrder()); // я не понимаю что делает reverseOrder
+        map<int, map<int, map<int, Match*>>> cycleDepthToMatches; // я не понимаю что делает reverseOrder,  по идее у нас не так упорядочено буит.
         auto inputSpanned = new IntervalUnion();
 
         auto nonOverlappingMatches = memoTable->getAllNonOverlappingMatches();
         auto maxCycleDepth = 0;
-        for (auto clauseIdx = memoTable->grammar.allClauses.size() - 1; clauseIdx >= 0; --clauseIdx) 
+        for (auto clauseIdx = memoTable->grammar->allClauses.size() - 1; clauseIdx >= 0; --clauseIdx)
         {
-            auto clause = memoTable->grammar.allClauses[clauseIdx];
+            auto clause = memoTable->grammar->allClauses[clauseIdx];
             auto matchesForClause = nonOverlappingMatches[clause];
-            if (matchesForClause != nullptr) 
+            if (!matchesForClause.empty())
             {
-                for (auto matchEnt : matchesForClause.entrySet()) 
+                for (auto matchEnt : matchesForClause)
                 {
                     auto match = matchEnt.second;
-                    auto matchStartPos = match.memoKey.startPos;
-                    auto matchEndPos = matchStartPos + match.len;
+                    auto matchStartPos = match->memoKey->startPos;
+                    auto matchEndPos = matchStartPos + match->len;
                     // Only add parse tree to chart if it doesn't overlap with input spanned by a higher-level match
-                    if (!inputSpanned.rangeOverlaps(matchStartPos, matchEndPos)) {
+                    if (!inputSpanned->rangeOverlaps(matchStartPos, matchEndPos)) {
                         // Pack matches into the lowest cycle they will fit into
                         auto cycleDepth = findCycleDepth(match, cycleDepthToMatches);
                         maxCycleDepth = max(maxCycleDepth, cycleDepth);
                         // Add the range spanned by this match
-                        inputSpanned.addRange(matchStartPos, matchEndPos);
+                        inputSpanned->addRange(matchStartPos, matchEndPos);
                     }
                 }
             }
         }
         vector<map<int, Match*>> matchesForRow;
-        vector<Clause> clauseForRow;
-        for (auto matchesForDepth : cycleDepthToMatches.values()) 
+        vector<Clause*> clauseForRow;
+        for (auto matchesForDepth : cycleDepthToMatches)
         {
-            for (auto matchesForClauseIdxEnt : matchesForDepth.entrySet()) 
+            for (auto matchesForClauseIdxEnt : matchesForDepth.second)
             {
-                clauseForRow.push_back(memoTable->grammar.allClauses[matchesForClauseIdxEnt.first]);
-                matchesForRow->push_back(matchesForClauseIdxEnt.second);
+                clauseForRow.push_back(memoTable->grammar->allClauses[matchesForClauseIdxEnt.first]);
+                matchesForRow.push_back(matchesForClauseIdxEnt.second);
             }
         }
 
         vector<string> rowLabel;
         auto rowLabelMaxWidth = 0;
-        for (auto i = 0; i < clauseForRow.size(); i++) 
+        for (auto i = 0; i < clauseForRow.size(); i++)
         {
-            Clause* clause = &clauseForRow[i];
-            if (clause->TypeOfClause == TypesOfClauses::Terminal) 
+            Clause* clause = clauseForRow[i];
+            if (clause->TypeOfClause == TypesOfClauses::Terminal)
             {
                 rowLabel[i].append("[terminal] ");
             }
-            if (clause->canMatchZeroChars) 
+            if (clause->canMatchZeroChars)
             {
                 rowLabel[i].append("[canMatchZeroChars] ");
             }
@@ -185,7 +185,7 @@ public:
         }
         for (auto i = 0; i < clauseForRow.size(); i++) {
             auto clause = clauseForRow[i];
-            auto clauseIdx = clause.clauseIdx;
+            auto clauseIdx = clause->clauseIdx;
             // Right-justify the row label
             string label = rowLabel[i];
             rowLabel[i].resize(0);
@@ -215,28 +215,28 @@ public:
             string rowTreeChars;
             rowTreeChars.append(edgeMarkers);
             vector<int> zeroLenMatchIdxs;
-            for (auto ent : matches) 
+            for (auto ent : matches)
             {
                 auto match = ent.second;
                 auto startIdx = match->memoKey->startPos;
                 auto endIdx = startIdx + match->len;
 
-                if (startIdx == endIdx) 
+                if (startIdx == endIdx)
                 {
                     // Zero-length match
                     zeroLenMatchIdxs.push_back(startIdx);
                 }
-                else 
+                else
                 {
                     // Match consumes 1 or more characters
-                    for (auto i = startIdx; i <= endIdx; i++) 
+                    for (auto i = startIdx; i <= endIdx; i++)
                     {
                         char chrLeft = rowTreeChars[i * 2];
                         rowTreeChars[i * 2] =
                             i == startIdx
                             ? (chrLeft == '│' ? '├' : chrLeft == '┤' ? '┼' : chrLeft == '┐' ? '┬' : '┌')
                             : i == endIdx ? (chrLeft == '│' ? '┤' : '┐') : '─';
-                        if (i < endIdx) 
+                        if (i < endIdx)
                         {
                             rowTreeChars[i * 2 + 1] = '─';
                         }
@@ -246,17 +246,17 @@ public:
             cout << emptyRowLabel;
             cout << rowTreeChars << endl;
 
-            for (auto ent : matches) 
+            for (auto ent : matches)
             {
                 auto match = ent.second;
                 auto startIdx = match->memoKey->startPos;
                 auto endIdx = startIdx + match->len;
                 edgeMarkers[startIdx * 2] = '│';
                 edgeMarkers[endIdx * 2] = '│';
-                for (int i = startIdx * 2 + 1, ii = endIdx * 2; i < ii; i++) 
+                for (int i = startIdx * 2 + 1, ii = endIdx * 2; i < ii; i++)
                 {
                     auto c = edgeMarkers[i];
-                    if (c == '░' || c == '│') 
+                    if (c == '░' || c == '│')
                     {
                         edgeMarkers[i] = ' ';
                     }
@@ -264,17 +264,17 @@ public:
             }
             rowTreeChars.resize(0);
             rowTreeChars.append(edgeMarkers);
-            for (auto ent : matches) 
+            for (auto ent : matches)
             {
                 auto match = ent.second;
                 auto startIdx = match->memoKey->startPos;
                 auto endIdx = startIdx + match->len;
-                for (int i = startIdx; i < endIdx; i++) 
+                for (int i = startIdx; i < endIdx; i++)
                 {
                     rowTreeChars[i * 2 + 1] = StringUtils::replaceNonASCII(memoTable->input[i]);
                 }
             }
-            for (auto zeroLenMatchIdx : zeroLenMatchIdxs) 
+            for (auto zeroLenMatchIdx : zeroLenMatchIdxs)
             {
                 rowTreeChars[zeroLenMatchIdx * 2] = '▮';
             }
@@ -283,12 +283,12 @@ public:
         }
 
         // Print input index digits
-        for (int j = 0; j < rowLabelMaxWidth + 6; j++) 
+        for (int j = 0; j < rowLabelMaxWidth + 6; j++)
         {
             cout << ' ';
         }
         cout << ' ';
-        for (int i = 0; i < memoTable->input.length(); i++) 
+        for (int i = 0; i < memoTable->input.length(); i++)
         {
             cout << i % 10;
             cout << ' ';
@@ -296,12 +296,12 @@ public:
         cout << endl;
 
         // Print input string
-        for (int i = 0; i < rowLabelMaxWidth + 6; i++) 
+        for (int i = 0; i < rowLabelMaxWidth + 6; i++)
         {
             cout << ' ';
         }
         cout << ' ';
-        for (int i = 0; i < memoTable->input.length(); i++) 
+        for (int i = 0; i < memoTable->input.length(); i++)
         {
             cout << StringUtils::replaceNonASCII(memoTable->input[i]);
             cout << ' ';
@@ -309,12 +309,12 @@ public:
         cout << endl;
     }
 
-    void printSyntaxErrors(map<int, pair<int, string>> syntaxErrors) 
+    void printSyntaxErrors(map<int, pair<int, string>> syntaxErrors)
     {
-        if (!syntaxErrors.empty()) 
+        if (!syntaxErrors.empty())
         {
             cout << endl << "SYNTAX ERRORS:" << endl;
-            for (auto ent : syntaxErrors) 
+            for (auto ent : syntaxErrors)
             {
                 auto startPos = ent.first;
                 auto endPos = ent.second.first;
@@ -326,10 +326,10 @@ public:
         }
     }
 
-    void printMatches(Clause* clause, MemoTable* memoTable, bool showAllMatches) 
+    void printMatches(Clause* clause, MemoTable* memoTable, bool showAllMatches)
     {
         auto matches = memoTable->getAllMatches(clause);
-        if (!matches.isEmpty()) 
+        if (!matches.empty())
         {
             cout << endl << "====================================" << endl << endl << "Matches for "
                 + clause->toStringWithRuleNames() + " :" << endl;
@@ -337,9 +337,9 @@ public:
             string astNodeLabel = "";
             if (!clause->rules.empty())
             {
-                for (auto rule : clause->rules) 
+                for (auto rule : clause->rules)
                 {
-                    if (rule->labeledClause->astNodeLabel != "") 
+                    if (rule->labeledClause->astNodeLabel != "")
                     {
                         if (astNodeLabel != "")
                         {
@@ -350,12 +350,12 @@ public:
                 }
             }
             auto prevEndPos = -1;
-            for (int j = 0; j < matches.size(); j++) 
+            for (int j = 0; j < matches.size(); j++)
             {
                 auto match = matches[j];
                 // Indent matches that overlap with previous longest match
-                auto overlapsPrevMatch = match.memoKey.startPos < prevEndPos;
-                if (!overlapsPrevMatch || showAllMatches) 
+                auto overlapsPrevMatch = match->memoKey->startPos < prevEndPos;
+                if (!overlapsPrevMatch || showAllMatches)
                 {
                     auto indent = overlapsPrevMatch ? "    " : "";
                     string buf;
@@ -363,21 +363,21 @@ public:
                         indent, true, buf);
                     cout << buf;
                 }
-                int newEndPos = match.memoKey.startPos + match.len;
-                if (newEndPos > prevEndPos) 
+                int newEndPos = match->memoKey->startPos + match->len;
+                if (newEndPos > prevEndPos)
                 {
                     prevEndPos = newEndPos;
                 }
             }
         }
-        else 
+        else
         {
             cout << endl <<
                 "====================================" << endl << endl << "No matches for " + clause->toStringWithRuleNames() << endl;
         }
     }
 
-    void printMatchesAndSubClauseMatches(Clause* clause, MemoTable* memoTable) 
+    void printMatchesAndSubClauseMatches(Clause* clause, MemoTable* memoTable)
     {
         printMatches(clause, memoTable, true);
         for (int i = 0; i < clause->labeledSubClauses.size(); i++)
@@ -386,19 +386,19 @@ public:
         }
     }
 
-    void printMatchesAndPartialMatches(Seq* seqClause, MemoTable* memoTable) 
+    void printMatchesAndPartialMatches(Seq* seqClause, MemoTable* memoTable)
     {
         auto numSubClauses = seqClause->labeledSubClauses.size();
-        for (auto subClause0Match : memoTable->getAllMatches(seqClause->labeledSubClauses[0]->clause)) 
+        for (auto subClause0Match : memoTable->getAllMatches(seqClause->labeledSubClauses[0]->clause))
         {
             vector<Match*> subClauseMatches;
             subClauseMatches.push_back(subClause0Match);
-            auto currStartPos = subClause0Match->memoKey->startPos + subClause0Match.len;
-            for (auto i = 1; i < numSubClauses; i++) 
+            auto currStartPos = subClause0Match->memoKey->startPos + subClause0Match->len;
+            for (auto i = 1; i < numSubClauses; i++)
             {
-                MemoKey x(seqClause->labeledSubClauses[i]->clause, currStartPos);
+                MemoKey* x = new MemoKey(seqClause->labeledSubClauses[i]->clause, currStartPos);
                 auto subClauseIMatch = memoTable->lookUpBestMatch(x);
-                if (subClauseIMatch == nullptr) 
+                if (subClauseIMatch == nullptr)
                 {
                     break;
                 }
@@ -407,9 +407,9 @@ public:
             cout << endl << "====================================" << endl << endl << "Matched "
                 + (subClauseMatches.size() == numSubClauses ? "all subclauses"
                     : subClauseMatches.size() + " out of " + numSubClauses + string(" subclauses"))
-                + " of clause (" + seqClause->toString() + ") at start pos " + subClause0Match.memoKey.startPos << endl << endl;
+                + " of clause (" + seqClause->toString() + ") at start pos " + to_string(subClause0Match->memoKey->startPos) << endl << endl;
 
-            for (int i = 0; i < subClauseMatches.size(); i++) 
+            for (int i = 0; i < subClauseMatches.size(); i++)
             {
                 auto subClauseMatch = subClauseMatches[i];
                 string buf;
@@ -420,19 +420,19 @@ public:
         }
     }
 
-    void printAST(string astNodeLabel, Clause* clause, MemoTable* memoTable) 
+    void printAST(string astNodeLabel, Clause* clause, MemoTable* memoTable)
     {
         auto matches = memoTable->getNonOverlappingMatches(clause);
-        for (int i = 0; i < matches.size(); i++) 
+        for (int i = 0; i < matches.size(); i++)
         {
-            auto match = matches.get(i);
+            auto match = matches[i];
             auto ast = new ASTNode(astNodeLabel, match, memoTable->input);
             cout << ast->toString() << endl;
         }
     }
 
     void printParseResult(string topLevelRuleName, MemoTable* memoTable,
-        vector<string> syntaxCoverageRuleNames, bool showAllMatches) 
+        vector<string> syntaxCoverageRuleNames, bool showAllMatches)
     {
         cout << endl << "Clauses:" << endl;
         printClauses(memoTable->grammar);
@@ -445,27 +445,27 @@ public:
         printParseTreeInMemoTableForm(memoTable);
 
         // Print all matches for each clause
-        for (auto i = memoTable->grammar.allClauses.size() - 1; i >= 0; --i) 
+        for (auto i = memoTable->grammar->allClauses.size() - 1; i >= 0; --i)
         {
-            auto clause = memoTable->grammar.allClauses[i];
+            auto clause = memoTable->grammar->allClauses[i];
             printMatches(clause, memoTable, showAllMatches);
         }
 
-        auto rule = memoTable->grammar.ruleNameWithPrecedenceToRule[topLevelRuleName];
-        if (rule != nullptr) 
+        auto rule = memoTable->grammar->ruleNameWithPrecedenceToRule[topLevelRuleName];
+        if (rule != nullptr)
         {
             cout << endl <<
-                "====================================" <<endl << endl << "AST for rule \"" + topLevelRuleName + "\":" << endl << endl;
+                "====================================" << endl << endl << "AST for rule \"" + topLevelRuleName + "\":" << endl << endl;
             auto ruleClause = rule->labeledClause->clause;
             printAST(topLevelRuleName, ruleClause, memoTable);
         }
-        else 
+        else
         {
             cout << endl << "Rule \"" + topLevelRuleName + "\" does not exist" << endl;
         }
 
         auto syntaxErrors = memoTable->getSyntaxErrors(syntaxCoverageRuleNames);
-        if (!syntaxErrors.isEmpty()) 
+        if (!syntaxErrors.empty())
         {
             printSyntaxErrors(syntaxErrors);
         }
