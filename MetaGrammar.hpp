@@ -85,7 +85,7 @@ private:
     * 2)  ак-то указать что этот umap не должен измен€тьс€
     */
 
-    Clause* expectOne(vector<Clause*> clauses, ASTNode* astNode) 
+    static Clause* expectOne(vector<Clause*> clauses, ASTNode* astNode) 
     {
         if (clauses.size() != 1) {
             cout << "Expected one subclause, got " << clauses.size() << ": " << astNode->toString();
@@ -93,7 +93,7 @@ private:
         return clauses[0];
     }
 
-    vector<Clause*> parseASTNodes(vector<ASTNode*> astNodes) 
+    static vector<Clause*> parseASTNodes(vector<ASTNode*> astNodes) 
     {
         vector<Clause*> clauses;
         for (auto astNode : astNodes) 
@@ -209,10 +209,10 @@ private:
 
 public:
     vector<Rule*> NecessaryRules = {
-        new Rule(GRAMMAR, ClauseFactory::seq(ClauseFactory::start(), ClauseFactory::ruleRef(WSC), ClauseFactory::oneOrMore(ClauseFactory::ruleRef(RULE)))),
-        new Rule(RULE, ClauseFactory::ast(RULE_AST, ClauseFactory::seq(ClauseFactory::ruleRef(IDENT), ClauseFactory::ruleRef(WSC), ClauseFactory::optional(ClauseFactory::ruleRef(PREC)), ClauseFactory::str("<-"), ClauseFactory::ruleRef(WSC), ClauseFactory::ruleRef(CLAUSE), ClauseFactory::ruleRef(WSC), ClauseFactory::c(vector<char> x = {';'}), ClauseFactory::ruleRef(WSC)))),
-        new Rule(CLAUSE, 8, /* associativity = */ Rule::Associativity::NONE, ClauseFactory::seq(ClauseFactory::c('('), ClauseFactory::ruleRef(WSC), ClauseFactory::ruleRef(CLAUSE), ClauseFactory::ruleRef(WSC), c(')'))),
-        new Rule(CLAUSE, 7, /* associativity = */ Rule::Associativity::NONE, ClauseFactory::first(ruleRef(IDENT), ruleRef(QUOTED_STRING), ClauseFactory::ruleRef(CHAR_SET), ClauseFactory::ruleRef(NOTHING), ClauseFactory::ruleRef(START))),
+        new Rule(GRAMMAR, ClauseFactory::seq(vector<Clause*> {ClauseFactory::start(), ClauseFactory::ruleRef(WSC), ClauseFactory::oneOrMore(ClauseFactory::ruleRef(RULE))})),
+        new Rule(RULE, ClauseFactory::ast(RULE_AST, ClauseFactory::seq(vector<Clause*> {ClauseFactory::ruleRef(IDENT), ClauseFactory::ruleRef(WSC), ClauseFactory::optional(ClauseFactory::ruleRef(PREC)), ClauseFactory::str("<-"), ClauseFactory::ruleRef(WSC), ClauseFactory::ruleRef(CLAUSE), ClauseFactory::ruleRef(WSC), ClauseFactory::c(vector<char> {';'}), ClauseFactory::ruleRef(WSC)}))),
+        new Rule(CLAUSE, 8, /* associativity = */ Rule::Associativity::NONE, ClauseFactory::seq(vector<Clause*> {(Clause*)ClauseFactory::c(vector<char> {'('}), ClauseFactory::ruleRef(WSC), ClauseFactory::ruleRef(CLAUSE), ClauseFactory::ruleRef(WSC), (Clause*)ClauseFactory::c(vector<char> {')'}) })),
+        new Rule(CLAUSE, 7, /* associativity = */ Rule::Associativity::NONE, ClauseFactory::first(vector<Clause*> {ClauseFactory::ruleRef(IDENT), ClauseFactory::ruleRef(QUOTED_STRING), ClauseFactory::ruleRef(CHAR_SET), ClauseFactory::ruleRef(NOTHING), ClauseFactory::ruleRef(START)})),
         new Rule(CLAUSE, 6, /* associativity = */ Rule::Associativity::NONE, ClauseFactory::first(ClauseFactory::seq(ast(ONE_OR_MORE_AST, ClauseFactory::ruleRef(CLAUSE)), ClauseFactory::ruleRef(WSC), c('+')), ClauseFactory::seq(ClauseFactory::ast(ZERO_OR_MORE_AST, ClauseFactory::ruleRef(CLAUSE)), ClauseFactory::ruleRef(WSC), ClauseFactory::c('*')))),
         new Rule(CLAUSE, 5, /* associativity = */ Rule::Associativity::NONE, ClauseFactory::first(ClauseFactory::seq(ClauseFactory::c('&'), ClauseFactory::ast(FOLLOWED_BY_AST, ClauseFactory::ruleRef(CLAUSE))), ClauseFactory::seq(c('!'), ClauseFactory::ast(NOT_FOLLOWED_BY_AST, ClauseFactory::ruleRef(CLAUSE))))),
         new Rule(CLAUSE, 4, /* associativity = */ Rule::Associativity::NONE, ClauseFactory::seq(ClauseFactory::ast(OPTIONAL_AST, ClauseFactory::ruleRef(CLAUSE)), ClauseFactory::ruleRef(WSC), ClauseFactory::c('?'))),
@@ -296,7 +296,7 @@ public:
 
         */
         auto topLevelRule = grammar->getRule(GRAMMAR);
-        auto topLevelRuleASTNodeLabel = topLevelRule.labeledClause.astNodeLabel;
+        auto topLevelRuleASTNodeLabel = topLevelRule->labeledClause->astNodeLabel;
         if (topLevelRuleASTNodeLabel == nullptr) 
         {
             topLevelRuleASTNodeLabel = "<root>";
@@ -317,7 +317,7 @@ public:
 
         ѕробрасывание ошибок тоже пока не учитываем
         */
-        auto topLevelMatch = topLevelMatches.get(0);
+        auto topLevelMatch = topLevelMatches[0];
 
         // TreeUtils.printTreeView(topLevelMatch, input);
 
