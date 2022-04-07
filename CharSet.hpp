@@ -61,7 +61,7 @@ public:
 
 	CharSet(bitset<256> chars) : Terminal()
 	{
-		if (chars.cardinality() == 0)
+		if (chars.count() == 0)
 		{
 			cout << "Must provide at least one CharSet";
 			abort();
@@ -132,8 +132,8 @@ public:
 	string toString() {
 		if (toStringCached.empty()) {
 			string buf;
-			auto charsCardinality = chars == NULL ? 0 : chars.cardinality();
-			auto invertedCharsCardinality = invertedChars == NULL ? 0 : invertedChars.cardinality();
+			auto charsCardinality = chars == NULL ? 0 : chars.count();
+			auto invertedCharsCardinality = invertedChars == NULL ? 0 : invertedChars.count();
 			auto invertedAndNot = charsCardinality > 0 && invertedCharsCardinality > 0;
 			if (invertedAndNot) {
 				buf.append("(");
