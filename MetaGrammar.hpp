@@ -15,55 +15,59 @@
 #include "ASTNode.hpp"
 #include "ASTNodeLabel.hpp"
 #include "RuleRef.hpp"
+#include "str_switch.hpp"
+
+// имена для правил
+
+#define GRAMMAR  "GRAMMAR"
+#define WSC  "WSC"
+#define COMMENT  "COMMENT"
+#define RULE  "RULE"
+#define CLAUSE  "CLAUSE"
+#define IDENT  "IDENT"
+#define PREC  "PREC"
+#define NUM  "NUM"
+#define NAME_CHAR  "NAME_CHAR"
+#define CHAR_SET  "CHARSET"
+#define HEX  "Hex"
+#define CHAR_RANGE  "CHAR_RANGE"
+#define CHAR_RANGE_CHAR  "CHAR_RANGE_CHAR"
+#define QUOTED_STRING  "QUOTED_STR"
+#define ESCAPED_CTRL_CHAR  "ESCAPED_CTRL_CHAR"
+#define SINGLE_QUOTED_CHAR  "SINGLE_QUOTED_CHAR"
+#define STR_QUOTED_CHAR  "STR_QUOTED_CHAR"
+#define NOTHING  "NOTHING"
+#define START  "START"
+
+
+// имена для вершин дерева разбора
+
+#define RULE_AST  "RuleAST"
+#define PREC_AST  "PrecAST"
+#define R_ASSOC_AST  "RAssocAST"
+#define L_ASSOC_AST  "LAssocAST"
+#define IDENT_AST  "IdentAST"
+#define LABEL_AST  "LabelAST"
+#define LABEL_NAME_AST  "LabelNameAST"
+#define LABEL_CLAUSE_AST  "LabelClauseAST"
+#define SEQ_AST   "SeqAST"
+#define FIRST_AST  "FirstAST"
+#define FOLLOWED_BY_AST  "FollowedByAST"
+#define NOT_FOLLOWED_BY_AST  "NotFollowedByAST"
+#define ONE_OR_MORE_AST  "OneOrMoreAST"
+#define ZERO_OR_MORE_AST  "ZeroOrMoreAST"
+#define OPTIONAL_AST  "OptionalAST"
+#define SINGLE_QUOTED_CHAR_AST  "SingleQuotedCharAST"
+#define CHAR_RANGE_AST  "CharRangeAST"
+#define QUOTED_STRING_AST  "QuotedStringAST"
+#define START_AST  "StartAST"
+#define NOTHING_AST  "NothingAST"
 
 class MetaGrammar
 {
 private:
 
-    // имена для правил
 
-    string GRAMMAR = "GRAMMAR";
-    string WSC = "WSC";
-    string COMMENT = "COMMENT";
-    string RULE = "RULE";
-    string CLAUSE = "CLAUSE";
-    string IDENT = "IDENT";
-    string PREC = "PREC";
-    string NUM = "NUM";
-    string NAME_CHAR = "NAME_CHAR";
-    string CHAR_SET = "CHARSET";
-    string HEX = "Hex";
-    string CHAR_RANGE = "CHAR_RANGE";
-    string CHAR_RANGE_CHAR = "CHAR_RANGE_CHAR";
-    string QUOTED_STRING = "QUOTED_STR";
-    string ESCAPED_CTRL_CHAR = "ESCAPED_CTRL_CHAR";
-    string SINGLE_QUOTED_CHAR = "SINGLE_QUOTED_CHAR";
-    string STR_QUOTED_CHAR = "STR_QUOTED_CHAR";
-    string NOTHING = "NOTHING";
-    string START = "START";
-
-    // имена для вершин дерева разбора
-
-    string RULE_AST = "RuleAST";
-    string PREC_AST = "PrecAST";
-    string R_ASSOC_AST = "RAssocAST";
-    string L_ASSOC_AST = "LAssocAST";
-    string IDENT_AST = "IdentAST";
-    string LABEL_AST = "LabelAST";
-    string LABEL_NAME_AST = "LabelNameAST";
-    string LABEL_CLAUSE_AST = "LabelClauseAST";
-    string SEQ_AST = "SeqAST";
-    string FIRST_AST = "FirstAST";
-    string FOLLOWED_BY_AST = "FollowedByAST";
-    string NOT_FOLLOWED_BY_AST = "NotFollowedByAST";
-    string ONE_OR_MORE_AST = "OneOrMoreAST";
-    string ZERO_OR_MORE_AST = "ZeroOrMoreAST";
-    string OPTIONAL_AST = "OptionalAST";
-    string SINGLE_QUOTED_CHAR_AST = "SingleQuotedCharAST";
-    string CHAR_RANGE_AST = "CharRangeAST";
-    string QUOTED_STRING_AST = "QuotedStringAST";
-    string START_AST = "StartAST";
-    string NOTHING_AST = "NothingAST";
 
     map<Clause, int> clauseTypeToPrecedence;
     clauseTypeToPrecedence[Terminal] = 7;
@@ -101,48 +105,48 @@ private:
     Clause* parseASTNode(ASTNode* astNode) 
     {
         Clause* clause;
-        switch (astNodelabel) 
+        SWITCH (astNode->label) 
         {
-        case SEQ_AST:
+        CASE ( SEQ_AST ) :
             clause = seq(parseASTNodes(astNode.children).toArray(new Clause[0]));
             break;
-        case FIRST_AST:
+        CASE (FIRST_AST ):
             clause = first(parseASTNodes(astNode.children).toArray(new Clause[0]));
             break;
-        case ONE_OR_MORE_AST:
+        CASE ( ONE_OR_MORE_AST ):
             clause = oneOrMore(expectOne(parseASTNodes(astNode.children), astNode));
             break;
-        case ZERO_OR_MORE_AST:
+        CASE ZERO_OR_MORE_AST:
             clause = zeroOrMore(expectOne(parseASTNodes(astNode.children), astNode));
             break;
-        case OPTIONAL_AST:
+        CASE OPTIONAL_AST:
             clause = optional(expectOne(parseASTNodes(astNode.children), astNode));
             break;
-        case FOLLOWED_BY_AST:
+        CASE FOLLOWED_BY_AST:
             clause = followedBy(expectOne(parseASTNodes(astNode.children), astNode));
             break;
-        case NOT_FOLLOWED_BY_AST:
+        CASE NOT_FOLLOWED_BY_AST:
             clause = notFollowedBy(expectOne(parseASTNodes(astNode.children), astNode));
             break;
-        case LABEL_AST:
+        CASE LABEL_AST:
             clause = ast(astNode.getFirstChild().getText(), parseASTNode(astNode.getSecondChild().getFirstChild()));
             break;
-        case IDENT_AST:
+        CASE IDENT_AST:
             clause = ruleRef(astNode.getText());
             break;
-        case QUOTED_STRING_AST:
+        CASE QUOTED_STRING_AST:
             clause = str(StringUtils.unescapeString(astNode.getText()));
             break;
-        case SINGLE_QUOTED_CHAR_AST:
+        CASE SINGLE_QUOTED_CHAR_AST:
             clause = c(StringUtils.unescapeChar(astNode.getText()));
             break;
-        case START_AST:
+        CASE START_AST:
             clause = start();
             break;
-        case NOTHING_AST:
+        CASE NOTHING_AST:
             clause = nothing();
             break;
-        case CHAR_RANGE_AST:
+        CASE CHAR_RANGE_AST:
             clause = cRange(astNode.getText());
             break;
         default:

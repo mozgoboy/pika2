@@ -5,7 +5,7 @@
 
 #define SWITCH(str)  switch(s_s::str_hash_for_switch(str))
 #define CASE(str)    static_assert(s_s::str_is_correct(str) && (s_s::str_len(str) <= s_s::MAX_LEN),\
-"CASE string contains wrong characters, or its length is greater than 9");\
+"CASE string contains wrong characters, or its length is greater than 1000");\
 case s_s::str_hash(str, s_s::str_len(str))
 #define DEFAULT  default
 
@@ -14,7 +14,7 @@ namespace s_s
     typedef unsigned char uchar;
     typedef unsigned long long ullong;
 
-    const uchar MAX_LEN = 9;
+    const uchar MAX_LEN = 1000;
     const ullong N_HASH = static_cast<ullong>(-1);
 
     constexpr ullong raise_128_to(const uchar power)
