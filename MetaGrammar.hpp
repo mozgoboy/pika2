@@ -529,7 +529,7 @@ public:
         */
         auto topLevelRule = grammar->getRule(GRAMMAR);
         auto topLevelRuleASTNodeLabel = topLevelRule->labeledClause->astNodeLabel;
-        if (topLevelRuleASTNodeLabel == nullptr) 
+        if (topLevelRuleASTNodeLabel.empty()) 
         {
             topLevelRuleASTNodeLabel = "<root>";
         }
