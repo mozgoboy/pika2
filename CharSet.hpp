@@ -57,13 +57,13 @@ public:
 		this->chars = chars;
 	}
 
-	CharSet invert() 
+	CharSet* invert() 
 	{
 		auto tmp = chars;
 		chars = invertedChars;
 		invertedChars = tmp;
 		toStringCached = "";
-		return *this;
+		return this;
 	}
 
 	void determineWhetherCanMatchZeroChars() 
