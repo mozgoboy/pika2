@@ -153,7 +153,7 @@ namespace ClauseFactory
             throw new IllegalArgumentException("maxChar < minChar");
             */
         }
-        bitset<8> bs;
+        bitset<256> bs;
         bs.set(minChar, maxChar + 1);
         return new CharSet(bs);
     }
@@ -185,22 +185,22 @@ namespace ClauseFactory
                     throw new IllegalArgumentException("Char range limits out of order: " + c0 + ", " + cEnd0);
                     */
                 }
-                chars.set(c0, cEnd0 + 1);
+                chars->set(c0, cEnd0 + 1);
                 i += 2;
             }
             else 
             {
-                chars.set(c0);
+                chars->set(c0);
             }
         }
         if (invert)
         {
-            CharSet* X = new CharSet(chars);
+            CharSet* X = new CharSet(*chars);
             return X->invert();
         }
         else
         {;
-            return new CharSet(chars);
+            return new CharSet(*chars);
         }
     }
 
