@@ -14,7 +14,7 @@
 class ParserInfo
 {
 private:
-    int findCycleDepth(Match* match,
+    static int findCycleDepth(Match* match,
         map<int, map<int, map<int, Match*>>> cycleDepthToMatches)
     {
         auto cycleDepth = 0;
@@ -40,7 +40,7 @@ private:
     }
 
 public:
-    void printClauses(Grammar* grammar)
+    static void printClauses(Grammar* grammar)
     {
         for (int i = grammar->allClauses.size() - 1; i >= 0; --i)
         {
@@ -49,7 +49,7 @@ public:
         }
     }
 
-    void printMemoTable(MemoTable* memoTable)
+    static void printMemoTable(MemoTable* memoTable)
     {
         vector<string> buf;
         int marginWidth = 0;
@@ -120,7 +120,7 @@ public:
         cout << StringUtils::replaceNonASCII(memoTable->input);
     }
 
-    void printParseTreeInMemoTableForm(MemoTable* memoTable)
+    static void printParseTreeInMemoTableForm(MemoTable* memoTable)
     {
         if (memoTable->grammar->allClauses.size() == 0)
         {
@@ -309,7 +309,7 @@ public:
         cout << endl;
     }
 
-    void printSyntaxErrors(map<int, pair<int, string>> syntaxErrors)
+    static void printSyntaxErrors(map<int, pair<int, string>> syntaxErrors)
     {
         if (!syntaxErrors.empty())
         {
@@ -326,7 +326,7 @@ public:
         }
     }
 
-    void printMatches(Clause* clause, MemoTable* memoTable, bool showAllMatches)
+    static void printMatches(Clause* clause, MemoTable* memoTable, bool showAllMatches)
     {
         auto matches = memoTable->getAllMatches(clause);
         if (!matches.empty())
@@ -377,7 +377,7 @@ public:
         }
     }
 
-    void printMatchesAndSubClauseMatches(Clause* clause, MemoTable* memoTable)
+    static void printMatchesAndSubClauseMatches(Clause* clause, MemoTable* memoTable)
     {
         printMatches(clause, memoTable, true);
         for (int i = 0; i < clause->labeledSubClauses.size(); i++)
@@ -386,7 +386,7 @@ public:
         }
     }
 
-    void printMatchesAndPartialMatches(Seq* seqClause, MemoTable* memoTable)
+    static void printMatchesAndPartialMatches(Seq* seqClause, MemoTable* memoTable)
     {
         auto numSubClauses = seqClause->labeledSubClauses.size();
         for (auto subClause0Match : memoTable->getAllMatches(seqClause->labeledSubClauses[0]->clause))
@@ -420,7 +420,7 @@ public:
         }
     }
 
-    void printAST(string astNodeLabel, Clause* clause, MemoTable* memoTable)
+    static void printAST(string astNodeLabel, Clause* clause, MemoTable* memoTable)
     {
         auto matches = memoTable->getNonOverlappingMatches(clause);
         for (int i = 0; i < matches.size(); i++)
@@ -431,7 +431,7 @@ public:
         }
     }
 
-    void printParseResult(string topLevelRuleName, MemoTable* memoTable,
+    static void printParseResult(string topLevelRuleName, MemoTable* memoTable,
         vector<string> syntaxCoverageRuleNames, bool showAllMatches)
     {
         cout << endl << "Clauses:" << endl;

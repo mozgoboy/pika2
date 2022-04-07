@@ -11,25 +11,27 @@
 
 namespace ClauseFactory
 {
-    Rule* rule(string ruleName, Clause* clause) 
+private:
+public:
+    static Rule* rule(string ruleName, Clause* clause) 
     {
         Rule rule(ruleName, -1, Rule::Associativity::NONE, clause);
         return &rule;
     }
 
-    Rule* rule(string ruleName, int precedence, Rule::Associativity associativity, Clause* clause)
+    static Rule* rule(string ruleName, int precedence, Rule::Associativity associativity, Clause* clause)
     {
         Rule rule(ruleName, precedence, associativity, clause);
         return &rule;
     }
 
-    Clause* seq(vector<Clause*> subClauses) 
+    static Clause* seq(vector<Clause*> subClauses) 
     {
         Seq sequence(subClauses);
         return &sequence;
     }
 
-    Clause* oneOrMore(Clause* subClause) 
+    static Clause* oneOrMore(Clause* subClause)
     {
         
         if (subClause->TypeOfClause == TypesOfClauses::OneOrMore || subClause->TypeOfClause == TypesOfClauses::Nothing || subClause->TypeOfClause == TypesOfClauses::FollowedBy
@@ -41,7 +43,7 @@ namespace ClauseFactory
         return (Clause*)&oom;
     }
 
-    Clause* optional(Clause* subClause) 
+    static Clause* optional(Clause* subClause)
     {
         vector<Clause*> X;
         X.push_back(subClause);
@@ -49,18 +51,18 @@ namespace ClauseFactory
         return first(X);
     }
 
-    Clause* zeroOrMore(Clause* subClause) 
+    static Clause* zeroOrMore(Clause* subClause)
     {
         return optional(oneOrMore(subClause));
     }
 
-    Clause* first(vector<Clause*> subClauses) 
+    static Clause* first(vector<Clause*> subClauses)
     {
         First X(subClauses);
         return &X;
     }
 
-    Clause* followedBy(Clause* subClause) 
+    static Clause* followedBy(Clause* subClause)
     {
         if (subClause->TypeOfClause == TypesOfClauses::Nothing)
         {
@@ -79,7 +81,7 @@ namespace ClauseFactory
         return &X;
     }
 
-    Clause* notFollowedBy(Clause* subClause) 
+    static Clause* notFollowedBy(Clause* subClause)
     {
         if (subClause->TypeOfClause == TypesOfClauses::Nothing)
         {
@@ -106,19 +108,19 @@ namespace ClauseFactory
         return (Clause*) &X;
     }
 
-    Clause* start() 
+    static Clause* start()
     {
         Start X;
         return &X;
     }
 
-    Clause* nothing() 
+    static Clause* nothing()
     {
         Nothing X;
         return &X;
     }
 
-    Clause* str(string str) 
+    static Clause* str(string str)
     {
         if (str.length() == 1) 
         {
@@ -133,20 +135,20 @@ namespace ClauseFactory
         }
     }
 
-    CharSet c(vector<char> chrs) 
+    static CharSet c(vector<char> chrs)
     {
         CharSet X(chrs);
         return X;
     }
 
-    CharSet cInStr(string str) 
+    static CharSet cInStr(string str)
     {
         vector<char> data(str.begin(), str.end());
         CharSet X(data);
         return X;
     }
 
-    CharSet cRange(char minChar, char maxChar) 
+    static CharSet cRange(char minChar, char maxChar)
     {
         if (maxChar < minChar) 
         {
@@ -160,7 +162,7 @@ namespace ClauseFactory
         return X;
     }
 
-    CharSet cRange(string charRangeStr) 
+    static CharSet cRange(string charRangeStr)
     {
         bool invert = charRangeStr[0] == '^';
         auto charList = StringUtils::getCharRangeChars(invert ? charRangeStr.substr(1) : charRangeStr); // Пока не совсем понял что эта функция делает
