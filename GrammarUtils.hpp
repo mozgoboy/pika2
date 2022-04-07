@@ -57,12 +57,12 @@ private:
         for (auto labeledSubClause : clause->labeledSubClauses) 
         {
             auto subClause = labeledSubClause->clause;
-            if (discovered.contains(subClause))
+            if (discovered.count(subClause) != 0)
             {
                 // Reached a cycle
                 cycleHeadClausesOut.insert(subClause);
             }
-            else if (!finished.contains(subClause))
+            else if (!finished.count(subClause) != 0)
             {
                 findCycleHeadClauses(subClause, discovered, finished, cycleHeadClausesOut);
             }
