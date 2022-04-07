@@ -7,6 +7,7 @@
 #include "Rule.hpp"
 #include "FollowedBy.hpp"
 #include "Seq.hpp"
+#include "Clause.hpp"
 
 class ClauseFactory
 {
@@ -125,7 +126,7 @@ public:
         {
             vector<char> X;
             X.push_back(str[0]);
-            return &c(X);
+            return c(X);
         }
         else 
         {
@@ -134,20 +135,18 @@ public:
         }
     }
 
-    static CharSet c(vector<char> chrs)
+    static CharSet* c(vector<char> chrs)
     {
-        CharSet X(chrs);
-        return X;
+        return new CharSet(chrs);
     }
 
-    static CharSet cInStr(string str)
+    static CharSet* cInStr(string str)
     {
         vector<char> data(str.begin(), str.end());
-        CharSet X(data);
-        return X;
+        return new CharSet(data);
     }
 
-    static CharSet cRange(char minChar, char maxChar)
+    static CharSet* cRange(char minChar, char maxChar)
     {
         if (maxChar < minChar) 
         {
@@ -157,11 +156,10 @@ public:
         }
         bitset<8> bs;
         bs.set(minChar, maxChar + 1);
-        CharSet X(bs);
-        return X;
+        return new CharSet(bs);
     }
 
-    static CharSet cRange(string charRangeStr)
+    static CharSet* cRange(string charRangeStr)
     {
         bool invert = charRangeStr[0] == '^';
         auto charList = StringUtils::getCharRangeChars(invert ? charRangeStr.substr(1) : charRangeStr); // Пока не совсем понял что эта функция делает
@@ -198,13 +196,27 @@ public:
         }
         if (invert)
         {
-            CharSet X(chars);
-            return X.invert();
+            CharSet* X = new CharSet(chars);
+            return X->invert();
         }
         else
-        {
-            CharSet X(chars);
-            return X;
+        {;
+            return new CharSet(chars);
         }
+    }
+
+    static CharSet* c(vector<CharSet*> charSets) 
+    {
+        return new CharSet(charSets);
+    }
+
+    static Clause* ast(string astNodeLabel, Clause* clause) 
+    {
+        return new ASTNodeLabel(astNodeLabel, clause);
+    }
+
+    static Clause* ruleRef(string ruleName) 
+    {
+        return new RuleRef(ruleName);
     }
 };
