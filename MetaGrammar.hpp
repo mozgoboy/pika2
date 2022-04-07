@@ -281,7 +281,7 @@ public:
         return subClausePrec < astNodeLabelPrec;
     }
 
-    Grammar parse(string input) 
+    static Grammar parse(string input) 
     {
         auto memoTable = grammar->parse(input);
 

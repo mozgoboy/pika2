@@ -5,12 +5,24 @@
 #include "Match.hpp"
 #include "MemoKey.hpp"
 #include "StringUtils.hpp"
+#include "Clause.hpp"
+
+
+int nextSetBit(bitset<256> chars, int indx)
+{
+	for (int i = indx; i < 256; i++)
+	{
+		if (chars[i])
+			return i;
+	}
+	return -1;
+}
 
 class CharSet : public Terminal
 {
 private:
-	bitset<8> chars;
-	bitset<8> invertedChars;
+	bitset<256> chars;
+	bitset<256> invertedChars;
 	//То что выше вроде как аналог их варианта, но у них почему-то это безразмерные множества.
 
 public:
@@ -36,18 +48,18 @@ public:
 		}
 		for (auto charSet : CharSets)
 		{
-			for (int i = charSet->chars.nextSetBit(0); i >= 0; i = charSet->chars._Find_next(i + 1)) // nextSetBit возвращает индекс следующего бита, я так понял аналога в std::bitset нет, наверное надо писать самостоятельно, так как Find_next из подключенного хэдера, который почему то подключается только как локальный не работает.
+			for (int i = nextSetBit(charSet->chars,0); i >= 0; i = charSet->chars._Find_next(i + 1)) // nextSetBit возвращает индекс следующего бита, я так понял аналога в std::bitset нет, наверное надо писать самостоятельно, так как Find_next из подключенного хэдера, который почему то подключается только как локальный не работает.
 			{
 				this->chars.set(i);
 			}
-			for (int i = charSet->invertedChars.nextSetBit(0); i >= 0; i = charSet->invertedChars.nextSetBit(i + 1)) 
+			for (int i = nextSetBit(charSet->invertedChars, 0); i >= 0; i = nextSetBit(charSet->invertedChars, i + 1))
 			{
 				this->invertedChars.set(i);
 			}
 		}
 	}
 
-	CharSet(bitset<8> chars) : Terminal()
+	CharSet(bitset<256> chars) : Terminal()
 	{
 		if (chars.cardinality() == 0)
 		{
@@ -57,13 +69,13 @@ public:
 		this->chars = chars;
 	}
 
-	CharSet invert() 
+	CharSet* invert() 
 	{
 		auto tmp = chars;
 		chars = invertedChars;
 		invertedChars = tmp;
 		toStringCached = "";
-		return *this;
+		return this;
 	}
 
 	void determineWhetherCanMatchZeroChars() 
@@ -74,7 +86,7 @@ public:
 		if (memoKey->startPos < input.length()) 
 		{
 			char c = input[memoKey->startPos];
-			bitset<8> b(c);
+			bitset<256> b(c);
 			if ((chars != NULL && (chars == b)) || (invertedChars != NULL && !(invertedChars == b))) 
 			{
 				Match* mast = new Match(memoKey, /* len = */ 1, Match::NO_SUBCLAUSE_MATCHES);
@@ -84,10 +96,10 @@ public:
 		return nullptr;
 	}
 
-	void toString(bitset<8> chars, int cardinality, bool inverted, string buf) {
+	void toString(bitset<256> chars, int cardinality, bool inverted, string buf) {
 		bool isSingleChar = !inverted && cardinality == 1;
 		if (isSingleChar) {
-			char c = (char)chars.nextSetBit(0);
+			char c = nextSetBit(chars,0);
 			buf.append("'");
 			buf.append(StringUtils::escapeQuotedChar(c));
 			buf.append("'");
@@ -97,12 +109,12 @@ public:
 			if (inverted) {
 				buf.append(" ^ ");
 			}
-			for (int i = chars.nextSetBit(0); i >= 0; i = chars.nextSetBit(i + 1)) {
+			for (int i = nextSetBit(chars,0); i >= 0; i = nextSetBit(chars,i + 1)) {
 				buf.append(StringUtils::escapeCharRangeChar((char)i));
-				if (i < chars.size() - 1 && chars.get(i + 1)) {
+				if (i < chars.size() - 1 && chars[i + 1]) {
 					// Contiguous char range
 					int end = i + 2;
-					while (end < chars.size() && chars.get(end)) {
+					while (end < chars.size() && chars[end]) {
 						end++;
 					}
 					int numCharsSpanned = end - i;

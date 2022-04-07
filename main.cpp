@@ -14,7 +14,7 @@ void tryParsing(Grammar* grammar, string topRuleName, vector<string> syntaxErrCo
 
 void main()
 {
-    auto grammar = MetaGrammar.parse("Expr <- Expr '+' '1' / Term '+' '1';\n" //
-        + "Term <- Term sym:[a-z] / sym:[a-z];\n");
-    tryParsing(grammar, "Expr", vector<string>{ "Expr", "Term" }, "aaaaaaaa+1+1+1+1+1");
+    auto grammar = MetaGrammar::parse("Expr <- Expr '+' '1' / Term '+' '1';\n" 
+        + "Term <- Term sym:\[a-z] / sym:[a-z];\n");
+    tryParsing(&grammar, "Expr", vector<string>{ "Expr", "Term" }, "aaaaaaaa+1+1+1+1+1");
 }
