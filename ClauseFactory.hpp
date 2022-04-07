@@ -9,7 +9,7 @@
 #include "Seq.hpp"
 #include "Clause.hpp"
 
-namespace ClauseFactory
+class ClauseFactory
 {
 private:
 public:

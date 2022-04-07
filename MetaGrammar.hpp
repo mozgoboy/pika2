@@ -18,7 +18,6 @@
 #include "str_switch.hpp"
 
 
-using namespace ClauseFactory;
 // имена для правил
 
 #define GRAMMAR  "GRAMMAR"
