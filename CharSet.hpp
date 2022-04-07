@@ -48,7 +48,7 @@ public:
 		}
 		for (auto charSet : CharSets)
 		{
-			for (int i = nextSetBit(charSet->chars,0); i >= 0; i = charSet->chars._Find_next(i + 1)) // nextSetBit возвращает индекс следующего бита, я так понял аналога в std::bitset нет, наверное надо писать самостоятельно, так как Find_next из подключенного хэдера, который почему то подключается только как локальный не работает.
+			for (int i = nextSetBit(charSet->chars,0); i >= 0; i = nextSetBit(charSet->chars,i + 1)) // nextSetBit возвращает индекс следующего бита, я так понял аналога в std::bitset нет, наверное надо писать самостоятельно, так как Find_next из подключенного хэдера, который почему то подключается только как локальный не работает.
 			{
 				this->chars.set(i);
 			}
