@@ -17,6 +17,7 @@
 #include "RuleRef.hpp"
 #include "str_switch.hpp"
 
+
 // имена для правил
 
 #define GRAMMAR  "GRAMMAR"
