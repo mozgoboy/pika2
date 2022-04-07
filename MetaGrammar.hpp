@@ -17,6 +17,8 @@
 #include "RuleRef.hpp"
 #include "str_switch.hpp"
 
+
+using namespace ClauseFactory;
 // имена для правил
 
 #define GRAMMAR  "GRAMMAR"
@@ -105,53 +107,49 @@ private:
     Clause* parseASTNode(ASTNode* astNode) 
     {
         Clause* clause;
-        SWITCH (astNode->label) 
+        if (astNode->label == SEQ_AST)
         {
-        CASE ( SEQ_AST ) :
-            clause = seq(parseASTNodes(astNode.children).toArray(new Clause[0]));
-            break;
-        CASE (FIRST_AST ):
-            clause = first(parseASTNodes(astNode.children).toArray(new Clause[0]));
-            break;
-        CASE ( ONE_OR_MORE_AST ):
-            clause = oneOrMore(expectOne(parseASTNodes(astNode.children), astNode));
-            break;
-        CASE ZERO_OR_MORE_AST:
+            clause = seq(parseASTNodes(astNode->children).toArray(new Clause[0]));
+        }
+        else if (astNode->label == SEQ_AST) {
+            clause = first(parseASTNodes(astNode->children).toArray(new Clause[0]));
+        }
+        else if (astNode->label == ONE_OR_MORE_AST) {
+            clause = oneOrMore(expectOne(parseASTNodes(astNode->children), astNode));
+        }
+        else if (astNode->label == ZERO_OR_MORE_AST) {
             clause = zeroOrMore(expectOne(parseASTNodes(astNode.children), astNode));
-            break;
-        CASE OPTIONAL_AST:
+        } else if (astNode->label == OPTIONAL_AST) {
             clause = optional(expectOne(parseASTNodes(astNode.children), astNode));
-            break;
-        CASE FOLLOWED_BY_AST:
+        }
+        else if (astNode->label == FOLLOWED_BY_AST) {
             clause = followedBy(expectOne(parseASTNodes(astNode.children), astNode));
-            break;
-        CASE NOT_FOLLOWED_BY_AST:
+        }
+        else if (astNode->label == NOT_FOLLOWED_BY_AST) {
             clause = notFollowedBy(expectOne(parseASTNodes(astNode.children), astNode));
-            break;
-        CASE LABEL_AST:
+        }
+        else if (astNode->label == LABEL_AST ) {
             clause = ast(astNode.getFirstChild().getText(), parseASTNode(astNode.getSecondChild().getFirstChild()));
-            break;
-        CASE IDENT_AST:
+        }
+        else if (astNode->label == IDENT_AST ) {
             clause = ruleRef(astNode.getText());
-            break;
-        CASE QUOTED_STRING_AST:
-            clause = str(StringUtils.unescapeString(astNode.getText()));
-            break;
-        CASE SINGLE_QUOTED_CHAR_AST:
-            clause = c(StringUtils.unescapeChar(astNode.getText()));
-            break;
-        CASE START_AST:
+        }
+        else if (astNode->label == QUOTED_STRING_AST ) {
+            clause = str(StringUtils::unescapeString(astNode.getText()));
+        }
+        else if (astNode->label == SINGLE_QUOTED_CHAR_AST) {
+            clause = c(StringUtils::unescapeChar(astNode.getText()));
+        }
+        else if (astNode->label == START_AST) {
             clause = start();
-            break;
-        CASE NOTHING_AST:
+        }
+        else if (astNode->label == NOTHING_AST) {
             clause = nothing();
-            break;
-        CASE CHAR_RANGE_AST:
+        }
+        else if (astNode->label == CHAR_RANGE_AST)
             clause = cRange(astNode.getText());
-            break;
-        default:
+        else {
             clause = expectOne(parseASTNodes(astNode.children), astNode);
-            break;
         }
         return clause;
     }

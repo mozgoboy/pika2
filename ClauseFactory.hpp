@@ -7,8 +7,9 @@
 #include "Rule.hpp"
 #include "FollowedBy.hpp"
 #include "Seq.hpp"
+#include "Clause.hpp"
 
-class ClauseFactory
+namespace ClauseFactory
 {
     Rule* rule(string ruleName, Clause* clause) 
     {
